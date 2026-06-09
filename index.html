@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CINECOLOR — Color Grading &amp; VFX — Amstelveen</title>
+  <meta name="description" content="Professional color grading, color correction and VFX compositing for digital film and video. Based in Amstelveen.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a0909;
+      --bg2:      #131110;
+      --gold:     oklch(72% 0.075 72);
+      --gold-dim: oklch(52% 0.055 72);
+      --cream:    oklch(91% 0.018 80);
+      --dim:      oklch(58% 0.018 80);
+      --dimmer:   oklch(38% 0.014 80);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ── Grain overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)' opacity='0.07'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 1;
+    }
+
+    /* ── Light leak from top ── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 340px;
+      background: radial-gradient(ellipse at center top, oklch(68% 0.09 68 / 0.13) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ── Letterbox bars ── */
+    .bar {
+      position: fixed;
+      left: 0; right: 0;
+      height: 36px;
+      background: #000;
+      z-index: 50;
+    }
+    .bar-top { top: 0; }
+    .bar-bottom { bottom: 0; }
+
+    /* ── Frame counter aesthetic ── */
+    .frame-counter {
+      font-family: 'Courier New', monospace;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      color: var(--dimmer);
+      position: fixed;
+      z-index: 60;
+      user-select: none;
+    }
+    .frame-counter.tl { top: 10px; left: 20px; }
+    .frame-counter.tr { top: 10px; right: 20px; }
+    .frame-counter.bl { bottom: 10px; left: 20px; }
+    .frame-counter.br { bottom: 10px; right: 20px; }
+
+    /* ── Main layout ── */
+    .stage {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 36px 0 36px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 24px 56px;
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+    }
+
+    .wordmark {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 15px;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: var(--cream);
+      text-decoration: none;
+    }
+
+    .header-dot {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: inline-block;
+      margin-bottom: 1px;
+      vertical-align: middle;
+    }
+
+    .header-sub {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--dimmer);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 40px;
+      gap: 0;
+    }
+
+    .hero-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 36px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--gold-dim);
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(64px, 10vw, 128px);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--cream);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .rule {
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, transparent, var(--gold-dim), transparent);
+      margin: 40px auto;
+    }
+
+    .hero-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(18px, 2.4vw, 26px);
+      color: var(--dim);
+      letter-spacing: 0.05em;
+      line-height: 1.5;
+      max-width: 560px;
+      margin-bottom: 52px;
+    }
+
+    .coming-soon-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid oklch(72% 0.075 72 / 0.3);
+      padding: 10px 28px;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: oklch(72% 0.075 72 / 0.04);
+    }
+
+    .coming-soon-badge::before {
+      content: '';
+      display: block;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* ── Specs strip ── */
+    .specs-strip {
+      border-top: 1px solid oklch(100% 0 0 / 0.06);
+      padding: 32px 56px;
+      display: flex;
+      align-items: flex-start;
+      gap: 56px;
+      flex-wrap: wrap;
+    }
+
+    .specs-label {
+      font-size: 9px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--dimmer);
+      margin-bottom: 14px;
+    }
+
+    .specs-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      list-style: none;
+    }
+
+    .specs-list li {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--dimmer);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .specs-list li::before {
+      content: '';
+      display: block;
+      width: 3px; height: 3px;
+      background: var(--gold-dim);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .specs-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid oklch(100% 0 0 / 0.06);
+      padding: 24px 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-location {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      color: var(--dimmer);
+      text-transform: uppercase;
+    }
+
+    .footer-cta {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+      border-bottom: 1px solid var(--gold-dim);
+      padding-bottom: 2px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .footer-cta:hover {
+      color: var(--cream);
+      border-color: var(--cream);
+    }
+
+    .footer-copy {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: var(--dimmer);
+      text-transform: uppercase;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      header { padding: 16px 24px; }
+      .hero { padding: 60px 24px; }
+      .specs-strip { padding: 24px; gap: 32px; }
+      footer { padding: 20px 24px; flex-direction: column; align-items: flex-start; gap: 12px; }
+      .bar { height: 28px; }
+      .stage { padding: 28px 0 28px; }
+      .frame-counter.tr, .frame-counter.br { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Letterbox bars -->
+  <div class="bar bar-top"></div>
+  <div class="bar bar-bottom"></div>
+
+  <!-- Frame counter decoration -->
+  <div class="frame-counter tl">CINECOLOR&nbsp;&nbsp;001A</div>
+  <div class="frame-counter tr">REC.709&nbsp;&nbsp;4K&nbsp;DCI</div>
+  <div class="frame-counter bl">AMSTELVEEN&nbsp;&nbsp;NL</div>
+  <div class="frame-counter br">2026&nbsp;&nbsp;©&nbsp;CINECOLOR</div>
+
+  <div class="stage">
+
+    <!-- Header -->
+    <header>
+      <span class="wordmark">Cinecolor</span>
+      <span class="header-dot"></span>
+      <span class="header-sub">Color Grading &amp; VFX</span>
+    </header>
+
+    <!-- Hero -->
+    <main class="hero">
+      <div class="hero-eyebrow">New site incoming</div>
+
+      <h1 class="hero-title">Cine<em>color</em></h1>
+
+      <div class="rule"></div>
+
+      <p class="hero-tagline">
+        Color grading &amp; visual effects for digital film and video.
+        Evoking emotion, frame by frame.
+      </p>
+
+      <div class="coming-soon-badge">Coming Soon</div>
+    </main>
+
+    <!-- Suite specs -->
+    <section class="specs-strip">
+      <div class="specs-group">
+        <p class="specs-label">Software Suite</p>
+        <ul class="specs-list">
+          <li>DaVinci Resolve Studio</li>
+          <li>Fusion Studio</li>
+          <li>Mocha Pro</li>
+        </ul>
+      </div>
+      <div class="specs-group">
+        <p class="specs-label">Capabilities</p>
+        <ul class="specs-list">
+          <li>Color Grading &amp; Correction</li>
+          <li>2D / 3D Compositing</li>
+          <li>Green Screen &amp; Rotoscoping</li>
+          <li>Object Insert &amp; Removal</li>
+          <li>Shot Stabilisation</li>
+          <li>VR Workflows</li>
+        </ul>
+      </div>
+      <div class="specs-group">
+        <p class="specs-label">Delivery</p>
+        <ul class="specs-list">
+          <li>Up to 4K DCI Mastering</li>
+          <li>Rec.709 / sRGB / DCI-P3</li>
+          <li>10-bit Monitoring</li>
+          <li>Broadcast Safe</li>
+          <li>DCP Delivery</li>
+          <li>XML · EDL · AAF · CDL</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <span class="footer-location">Amstelveen &nbsp;·&nbsp; Netherlands</span>
+      <a href="https://formspree.io/f/mlgknyrq" target="_blank" rel="noopener" class="footer-cta">Request a quote &rarr;</a>
+      <span class="footer-copy">cinecolor.nl</span>
+    </footer>
+
+  </div>
+
+</body>
+</html>
