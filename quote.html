@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request a Quote — CINECOLOR</title>
+  <meta name="description" content="Request a color grading or VFX quote from Cinecolor, Amstelveen.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a0909;
+      --bg2:      #131110;
+      --field:    #0f0e0d;
+      --border:   oklch(100% 0 0 / 0.09);
+      --border-focus: oklch(72% 0.075 72 / 0.55);
+      --gold:     oklch(72% 0.075 72);
+      --gold-dim: oklch(52% 0.055 72);
+      --cream:    oklch(91% 0.018 80);
+      --dim:      oklch(58% 0.018 80);
+      --dimmer:   oklch(38% 0.014 80);
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+    }
+
+    /* ── Grain ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)' opacity='0.07'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* ── Light leak ── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -120px; left: 50%;
+      transform: translateX(-50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse at center top, oklch(68% 0.09 68 / 0.10) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ── Letterbox bars ── */
+    .bar {
+      position: fixed;
+      left: 0; right: 0;
+      height: 36px;
+      background: #000;
+      z-index: 50;
+    }
+    .bar-top { top: 0; }
+    .bar-bottom { bottom: 0; }
+
+    /* ── Frame counters ── */
+    .frame-counter {
+      font-family: 'Courier New', monospace;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      color: var(--dimmer);
+      position: fixed;
+      z-index: 60;
+      user-select: none;
+    }
+    .frame-counter.tl { top: 10px; left: 20px; }
+    .frame-counter.tr { top: 10px; right: 20px; }
+    .frame-counter.bl { bottom: 10px; left: 20px; }
+    .frame-counter.br { bottom: 10px; right: 20px; }
+
+    /* ── Page layout ── */
+    .stage {
+      position: relative;
+      z-index: 2;
+      padding: 36px 0 60px;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 20px 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .wordmark {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 14px;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: var(--cream);
+      text-decoration: none;
+    }
+
+    .back-link {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--dimmer);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--gold); }
+    .back-link::before {
+      content: '←';
+      font-size: 12px;
+    }
+
+    /* ── Form container ── */
+    .form-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 64px 40px 80px;
+    }
+
+    .form-heading {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .form-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    .form-eyebrow::before, .form-eyebrow::after {
+      content: '';
+      display: block;
+      width: 32px; height: 1px;
+      background: var(--gold-dim);
+    }
+
+    .form-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(36px, 5vw, 52px);
+      letter-spacing: 0.08em;
+      color: var(--cream);
+      line-height: 1.1;
+    }
+
+    .form-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    /* ── Form fields ── */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .field-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      border: 1px solid var(--border);
+      border-bottom: none;
+    }
+
+    .field-group.single {
+      grid-template-columns: 1fr;
+    }
+
+    .field-group:first-of-type {
+      border-radius: 4px 4px 0 0;
+      overflow: hidden;
+    }
+
+    .field-group:last-of-type {
+      border-bottom: 1px solid var(--border);
+      border-radius: 0 0 4px 4px;
+      overflow: hidden;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      background: var(--field);
+      padding: 16px 20px;
+      gap: 6px;
+      border-right: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    .field:last-child { border-right: none; }
+
+    .field:focus-within {
+      background: oklch(14% 0.01 72);
+    }
+
+    .field label {
+      font-size: 9px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      line-height: 1.5;
+      width: 100%;
+      resize: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: var(--dimmer);
+    }
+
+    .field select {
+      cursor: pointer;
+      color: var(--cream);
+    }
+
+    .field select option {
+      background: #1a1816;
+      color: var(--cream);
+    }
+
+    /* Select arrow */
+    .select-wrap {
+      position: relative;
+    }
+    .select-wrap::after {
+      content: '↓';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gold-dim);
+      font-size: 11px;
+      pointer-events: none;
+    }
+
+    .field textarea {
+      min-height: 90px;
+    }
+
+    /* ── Project type chips ── */
+    .type-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-top: 2px;
+    }
+
+    .type-chip input[type="checkbox"] {
+      display: none;
+    }
+
+    .type-chip label {
+      display: inline-block;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--dimmer);
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+      user-select: none;
+    }
+
+    .type-chip input:checked + label {
+      color: var(--gold);
+      border-color: oklch(72% 0.075 72 / 0.4);
+      background: oklch(72% 0.075 72 / 0.06);
+    }
+
+    .type-chip label:hover {
+      color: var(--dim);
+      border-color: oklch(100% 0 0 / 0.18);
+    }
+
+    /* ── Divider between groups ── */
+    .field-section-label {
+      font-size: 9px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--dimmer);
+      margin: 36px 0 8px;
+    }
+
+    /* ── Submit ── */
+    .submit-row {
+      margin-top: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .submit-note {
+      font-size: 11px;
+      color: var(--dimmer);
+      letter-spacing: 0.06em;
+      line-height: 1.5;
+    }
+
+    button[type="submit"] {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      border: 1px solid oklch(72% 0.075 72 / 0.4);
+      color: var(--gold);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+
+    button[type="submit"]:hover {
+      background: oklch(72% 0.075 72 / 0.08);
+      border-color: var(--gold);
+      color: var(--cream);
+    }
+
+    button[type="submit"]:active {
+      background: oklch(72% 0.075 72 / 0.14);
+    }
+
+    button[type="submit"] .btn-arrow {
+      transition: transform 0.2s;
+    }
+    button[type="submit"]:hover .btn-arrow { transform: translateX(4px); }
+
+    /* ── Success state ── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 80px 40px;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .success-screen.visible { display: flex; }
+
+    .success-icon {
+      width: 48px; height: 48px;
+      border: 1px solid var(--gold-dim);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold);
+      font-size: 20px;
+    }
+
+    .success-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px;
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      color: var(--cream);
+    }
+
+    .success-sub {
+      font-size: 14px;
+      color: var(--dim);
+      max-width: 400px;
+      line-height: 1.6;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      header { padding: 16px 24px; }
+      .form-wrap { padding: 40px 20px 60px; }
+      .field-group { grid-template-columns: 1fr; }
+      .field { border-right: none; border-bottom: 1px solid var(--border); }
+      .field:last-child { border-bottom: none; }
+      .bar { height: 28px; }
+      .stage { padding: 28px 0 48px; }
+      .frame-counter.tr, .frame-counter.br { display: none; }
+      .submit-row { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bar bar-top"></div>
+  <div class="bar bar-bottom"></div>
+
+  <div class="frame-counter tl">CINECOLOR&nbsp;&nbsp;QUOTE</div>
+  <div class="frame-counter tr">REC.709&nbsp;&nbsp;4K&nbsp;DCI</div>
+  <div class="frame-counter bl">AMSTELVEEN&nbsp;&nbsp;NL</div>
+  <div class="frame-counter br">2026&nbsp;&nbsp;©&nbsp;CINECOLOR</div>
+
+  <div class="stage">
+
+    <header>
+      <a href="index.html" class="wordmark">Cinecolor</a>
+      <a href="index.html" class="back-link">Back</a>
+    </header>
+
+    <div class="form-wrap">
+
+      <div class="form-heading">
+        <div class="form-eyebrow">Get in touch</div>
+        <h1 class="form-title">Request a <em>Quote</em></h1>
+      </div>
+
+      <!-- Form -->
+      <form id="quoteForm" action="https://formspree.io/f/mlgknyrq" method="POST">
+
+        <p class="field-section-label">Your details</p>
+
+        <div class="field-group">
+          <div class="field">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Your name" required>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="your@email.com" required>
+          </div>
+        </div>
+
+        <div class="field-group single">
+          <div class="field">
+            <label for="company">Company / Production</label>
+            <input type="text" id="company" name="company" placeholder="Optional">
+          </div>
+        </div>
+
+        <p class="field-section-label" style="margin-top:32px;">Project details</p>
+
+        <div class="field-group single">
+          <div class="field">
+            <label>Project type</label>
+            <div class="type-chips">
+              <span class="type-chip"><input type="checkbox" id="t1" name="type" value="Commercial"><label for="t1">Commercial</label></span>
+              <span class="type-chip"><input type="checkbox" id="t2" name="type" value="Feature Film"><label for="t2">Feature Film</label></span>
+              <span class="type-chip"><input type="checkbox" id="t3" name="type" value="Documentary"><label for="t3">Documentary</label></span>
+              <span class="type-chip"><input type="checkbox" id="t4" name="type" value="Short Film"><label for="t4">Short Film</label></span>
+              <span class="type-chip"><input type="checkbox" id="t5" name="type" value="Music Video"><label for="t5">Music Video</label></span>
+              <span class="type-chip"><input type="checkbox" id="t6" name="type" value="VFX Only"><label for="t6">VFX Only</label></span>
+              <span class="type-chip"><input type="checkbox" id="t7" name="type" value="Other"><label for="t7">Other</label></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group single">
+          <div class="field">
+            <label for="description">Project description</label>
+            <textarea id="description" name="description" placeholder="Brief description of your project and what you need..." rows="4"></textarea>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field">
+            <label for="format">Footage format</label>
+            <input type="text" id="format" name="format" placeholder="e.g. BRAW, ProRes, H.264">
+          </div>
+          <div class="field">
+            <label for="resolution">Resolution</label>
+            <div class="select-wrap">
+              <select id="resolution" name="resolution">
+                <option value="" disabled selected>Select</option>
+                <option>HD 1080p</option>
+                <option>2K</option>
+                <option>4K UHD</option>
+                <option>4K DCI</option>
+                <option>6K+</option>
+                <option>Mixed</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field">
+            <label for="duration">Approx. duration / material</label>
+            <input type="text" id="duration" name="duration" placeholder="e.g. 30s spot, 90 min feature">
+          </div>
+          <div class="field">
+            <label for="deadline">Deadline</label>
+            <input type="text" id="deadline" name="deadline" placeholder="e.g. end of July 2026">
+          </div>
+        </div>
+
+        <div class="field-group single">
+          <div class="field">
+            <label for="notes">Additional notes</label>
+            <textarea id="notes" name="notes" placeholder="References, special requests, technical requirements..." rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="submit-row">
+          <p class="submit-note">I'll reply as soon as possible<br>with a tailored quote.</p>
+          <button type="submit">
+            Send Request
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+
+      </form>
+
+      <!-- Success screen -->
+      <div class="success-screen" id="successScreen">
+        <div class="success-icon">✓</div>
+        <h2 class="success-title">Thank you</h2>
+        <p class="success-sub">Your request has been received. I'll be in touch as soon as possible with a quote.</p>
+        <a href="index.html" class="back-link" style="margin-top:16px;">Back to cinecolor.nl</a>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('quoteForm');
+    const success = document.getElementById('successScreen');
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      btn.textContent = 'Sending…';
+      btn.disabled = true;
+
+      try {
+        const data = new FormData(form);
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: data,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (res.ok) {
+          form.style.display = 'none';
+          form.previousElementSibling.style.display = 'none'; // hide eyebrow / title
+          document.querySelector('.form-heading').style.display = 'none';
+          success.classList.add('visible');
+        } else {
+          btn.textContent = 'Something went wrong — try again';
+          btn.disabled = false;
+        }
+      } catch {
+        btn.textContent = 'Something went wrong — try again';
+        btn.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>
