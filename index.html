@@ -6,7 +6,7 @@
   <title>CINECOLOR — Color Grading &amp; VFX — Amstelveen</title>
   <meta name="description" content="Professional color grading, color correction and VFX compositing for digital film and video. Based in Amstelveen.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400&display=swap" rel="stylesheet">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -137,58 +137,36 @@
       gap: 0;
     }
 
-    .hero-eyebrow {
-      font-size: 10px;
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 36px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .hero-eyebrow::before,
-    .hero-eyebrow::after {
-      content: '';
-      display: block;
-      width: 40px;
-      height: 1px;
-      background: var(--gold-dim);
-    }
-
     .hero-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: clamp(64px, 10vw, 128px);
-      letter-spacing: 0.22em;
+      font-family: 'Cinzel', serif;
+      font-weight: 400;
+      font-size: clamp(52px, 9vw, 130px);
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--cream);
+      background: linear-gradient(180deg,
+        #ede3bc 0%,
+        #d4af5a 45%,
+        #b8882a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       line-height: 1;
-      margin-bottom: 8px;
+      margin-bottom: 0;
     }
 
-    .hero-title em {
-      font-style: italic;
-      color: var(--gold);
-    }
-
-    .rule {
-      width: 1px;
-      height: 60px;
-      background: linear-gradient(to bottom, transparent, var(--gold-dim), transparent);
-      margin: 40px auto;
-    }
-
-    .hero-tagline {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-weight: 300;
-      font-size: clamp(18px, 2.4vw, 26px);
-      color: var(--dim);
-      letter-spacing: 0.05em;
-      line-height: 1.5;
-      max-width: 560px;
+    .hero-subtitle {
+      font-family: 'Cinzel', serif;
+      font-weight: 400;
+      font-size: clamp(12px, 1.6vw, 22px);
+      letter-spacing: 0.52em;
+      text-transform: uppercase;
+      background: linear-gradient(180deg,
+        #d4c48a 0%,
+        #a88a3a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-top: 0.55em;
       margin-bottom: 52px;
     }
 
@@ -404,16 +382,8 @@
 
     <!-- Hero -->
     <main class="hero">
-      <div class="hero-eyebrow">New site incoming</div>
-
       <h1 class="hero-title">Cinecolor</h1>
-
-      <div class="rule"></div>
-
-      <p class="hero-tagline">
-        Color grading &amp; visual effects for digital film and video.
-        Evoking emotion, frame by frame.
-      </p>
+      <p class="hero-subtitle">Amsterdam</p>
 
       <div class="coming-soon-badge">Coming Soon</div>
     </main>
@@ -466,9 +436,21 @@
     const skipBtn = document.getElementById('preroll-skip');
     const skipBar = document.getElementById('skip-progress');
 
+    // Hide page content until preroll ends
+    const fadeEls = [
+      document.querySelector('.stage'),
+      ...document.querySelectorAll('.bar'),
+      ...document.querySelectorAll('.frame-counter')
+    ];
+    fadeEls.forEach(el => {
+      el.style.opacity = '0';
+      el.style.transition = 'opacity 1.2s ease';
+    });
+
     function dismiss() {
       preroll.classList.add('fade-out');
-      setTimeout(() => preroll.remove(), 900);
+      fadeEls.forEach(el => { el.style.opacity = '1'; });
+      setTimeout(() => preroll.remove(), 1300);
     }
 
     // Dismiss when video ends
